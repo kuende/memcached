@@ -62,6 +62,16 @@ Spec2.describe Memcached::Client do
     end
   end
 
+  describe "flush" do
+    it "deletes all keys" do
+      client.set("foo1", "test1")
+      client.set("foo2", "test2")
+      client.flush
+      expect(client.get("foo1")).to eq(nil)
+      expect(client.get("foo2")).to eq(nil)
+    end
+  end
+
   describe "delete" do
     it "deletes existing key" do
       client.set("foo", "value")
@@ -71,6 +81,36 @@ Spec2.describe Memcached::Client do
 
     it "deletes not existing key" do
       expect(client.delete("foo")).to eq(false)
+    end
+  end
+
+  describe "append" do
+    it "appends to existing key" do
+      client.set("foo", "bar")
+      client.append("foo", "baz")
+      expect(client.get("foo")).to eq("barbaz")
+    end
+
+    it "raises error for to non existing key" do
+      expect do
+        client.append("foo2", "bar")
+      end.to raise_error(Memcached::NotStoredError)
+      expect(client.get("foo2")).to eq(nil)
+    end
+  end
+
+  describe "prepend" do
+    it "prepends to existing key" do
+      client.set("foo", "bar")
+      client.prepend("foo", "baz")
+      expect(client.get("foo")).to eq("bazbar")
+    end
+
+    it "raises error for non existing key" do
+      expect do
+        client.prepend("foo2", "baz")
+      end.to raise_error(Memcached::NotStoredError)
+      expect(client.get("foo2")).to eq(nil)
     end
   end
 end

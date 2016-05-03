@@ -94,6 +94,16 @@ module Memcached
       true
     end
 
+    # Append a value to a key
+    def append(key : String, value : String, ttl : Number = 0, flags : Number = 0)
+      store("append", key, value, ttl, flags)
+    end
+
+    # Prepend a value to a key
+    def prepend(key : String, value : String, ttl : Number = 0, flags : Number = 0)
+      store("prepend", key, value, ttl, flags)
+    end
+
     private def write(value : String)
       bytes = value.bytes
       @socket.write(Slice(UInt8).new(bytes.to_unsafe, bytes.size))
