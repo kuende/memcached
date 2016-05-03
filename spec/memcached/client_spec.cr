@@ -5,13 +5,16 @@ Spec2.describe Memcached::Client do
     Memcached::Client.new("localhost", 11211)
   end
 
+  before do
+    client.flush
+  end
+
   after do
     client.close
   end
 
   describe "#get and set" do
     it "sets then gets" do
-      client.flush
       client.set("foo:asdf", "bar")
       expect(client.get("foo:asdf")).to eq("bar")
     end
@@ -21,7 +24,6 @@ Spec2.describe Memcached::Client do
     end
 
     it "sets with expire" do
-      client.flush
       client.set("expires", "soon", 2)
       expect(client.get("expires")).to eq("soon")
       sleep(3)
@@ -31,7 +33,6 @@ Spec2.describe Memcached::Client do
 
   describe "get_multi" do
     it "gets multiple keys" do
-      client.flush
       client.set("key1", "value1")
       client.set("key3", "value3")
 
@@ -43,6 +44,21 @@ Spec2.describe Memcached::Client do
         "key4": nil,
         "key5": nil
       })
+    end
+  end
+
+  describe "add" do
+    it "adds to nil value" do
+      client.add("foo", "value")
+      expect(client.get("foo")).to eq("value")
+    end
+
+    it "adds multiple times" do
+      client.set("foo", "value1")
+      expect do
+        client.add("foo", "value2")
+      end.to raise_error(Memcached::NotStoredError)
+      expect(client.get("foo")).to eq("value1")
     end
   end
 end

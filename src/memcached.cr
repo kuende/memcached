@@ -10,6 +10,7 @@ module Memcached
 
   class BadVersionException < RecoverableError; end
   class NotFoundError < RecoverableError; end
+  class NotStoredError < RecoverableError; end
 
   class EOFError < UnrecoverableError; end
   class ReadError < UnrecoverableError; end

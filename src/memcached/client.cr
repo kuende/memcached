@@ -52,7 +52,7 @@ module Memcached
     # if versions differ, *Memcached::BadVersionException* will be raised
     def set(key : String, value : String, ttl : Number = 0, flags : Number = 0)
       store("set", key, value, ttl, flags)
-      Memcached.logger.info("Cache Set: #{key}")
+      Memcached.logger.info("Cache set: #{key}")
     end
 
     # flush deletes all keys from memcached
@@ -67,6 +67,12 @@ module Memcached
       if line != "OK\r\n"
         raise FlushError.new("Expected OK, got: #{line}")
       end
+    end
+
+    # Similar to set, it fails if key already exists
+    def add(key : String, value : String, ttl : Number = 0, flags : Number = 0)
+      store("add", key, value, ttl, flags)
+      Memcached.logger.info("Cache add: #{key}")
     end
 
     private def write(value : String)
@@ -85,7 +91,9 @@ module Memcached
         raise EOFError.new("EOF reached")
       end
 
-      if line != "STORED\r\n"
+      if line == "NOT_STORED\r\n"
+        raise NotStoredError.new("Value not stored, precondition failed")
+      elsif line != "STORED\r\n"
         raise WriteError.new("Expected STORED, found: #{line}")
       end
     end
