@@ -62,9 +62,7 @@ module Memcached
       line = @socket.gets('\n')
       if line.nil?
         raise EOFError.new("EOF reached")
-      end
-
-      if line != "OK\r\n"
+      elsif line != "OK\r\n"
         raise FlushError.new("Expected OK, got: #{line}")
       end
     end
@@ -73,6 +71,21 @@ module Memcached
     def add(key : String, value : String, ttl : Number = 0, flags : Number = 0)
       store("add", key, value, ttl, flags)
       Memcached.logger.info("Cache add: #{key}")
+    end
+
+    # Delete a key from Memcached
+    def delete(key : String) : Bool
+      write("delete #{key}\r\n")
+
+      line = @socket.gets('\n')
+      if line.nil?
+        raise EOFError.new("EOF reached")
+      elsif line == "NOT_FOUND\r\n"
+        return false
+      elsif line != "DELETED\r\n"
+        raise DeleteError.new("Expected DELETED, got: #{line}")
+      end
+      true
     end
 
     private def write(value : String)

@@ -61,4 +61,16 @@ Spec2.describe Memcached::Client do
       expect(client.get("foo")).to eq("value1")
     end
   end
+
+  describe "delete" do
+    it "deletes existing key" do
+      client.set("foo", "value")
+      expect(client.delete("foo")).to eq(true)
+      expect(client.get("foo")).to eq(nil)
+    end
+
+    it "deletes not existing key" do
+      expect(client.delete("foo")).to eq(false)
+    end
+  end
 end
