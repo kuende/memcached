@@ -104,6 +104,11 @@ module Memcached
       store("prepend", key, value, ttl, flags)
     end
 
+    # Replace sets value if key exists
+    def replace(key : String, value : String, ttl : Number = 0, flags : Number = 0)
+      store("replace", key, value, ttl, flags)
+    end
+
     # Increment key by value
     def incr(key : String, value : Number = 1)
       incdec("incr", key, value)

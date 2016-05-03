@@ -147,6 +147,7 @@ Spec2.describe Memcached::Client do
       client.incr("my.key1", 100)
       client.decr("my.key1")
       client.decr("my.key1")
+      client.decr("my.key1")
 
       expect(client.get("my.key1").try &.strip).to eq("97")
     end
@@ -158,6 +159,21 @@ Spec2.describe Memcached::Client do
       client.decr("my.key", 3)
 
       expect(client.get("my.key").try &.strip).to eq("1")
+    end
+  end
+
+  describe "replace" do
+    it "replaces existing value" do
+      client.set("my.key", "foo")
+      client.replace("my.key", "bar")
+      expect(client.get("my.key")).to eq("bar")
+    end
+
+    it "raises error for not present key" do
+      expect do
+        client.replace("my.key", "bar")
+      end.to raise_error(Memcached::NotStoredError)
+      expect(client.get("my.key")).to eq(nil)
     end
   end
 end
