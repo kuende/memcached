@@ -1,5 +1,9 @@
 module Memcached
   class Client
+    @host : String
+    @port : Int32
+    @read_timeout : Float64?
+    @write_timeout : Float64?
     @socket : TCPSocket
 
     # Opens connection to Memcached server
@@ -7,9 +11,11 @@ module Memcached
     # **Options**
     # * host : String - memcached host
     # * port : Number - memcached port
-    def initialize(host = "localhost", port = 11211)
+    def initialize(@host = "localhost", @port = 11211, @read_timeout = nil, @write_timeout = nil)
       Memcached.logger.info("Connecting to #{host}:#{port}")
       @socket = TCPSocket.new(host, port)
+      @socket.read_timeout = @read_timeout
+      @socket.write_timeout = @write_timeout
     end
 
     # Close the socket connection
