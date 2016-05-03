@@ -113,4 +113,51 @@ Spec2.describe Memcached::Client do
       expect(client.get("foo2")).to eq(nil)
     end
   end
+
+  describe "incr" do
+    it "increments zero value" do
+      client.incr("my.key1")
+      expect(client.get("my.key1").try &.strip).to eq("1")
+    end
+
+    it "increments multiple times" do
+      client.incr("my.key1")
+      client.incr("my.key1")
+      client.incr("my.key1")
+
+      expect(client.get("my.key1").try &.strip).to eq("3")
+    end
+
+    it "increments by multiple" do
+      client.incr("my.key", 2)
+      client.incr("my.key")
+      client.incr("my.key", 3)
+
+      expect(client.get("my.key").try &.strip).to eq("6")
+    end
+  end
+
+  describe "decr" do
+    it "decrements zero value" do
+      client.decr("my.key1")
+      expect(client.get("my.key1").try &.strip).to eq("-1")
+    end
+
+    it "decrements multiple times" do
+      client.incr("my.key1", 100)
+      client.decr("my.key1")
+      client.decr("my.key1")
+
+      expect(client.get("my.key1").try &.strip).to eq("97")
+    end
+
+    it "decrements by multiple" do
+      client.set("my.key", "7")
+      client.decr("my.key", 2)
+      client.decr("my.key")
+      client.decr("my.key", 3)
+
+      expect(client.get("my.key").try &.strip).to eq("1")
+    end
+  end
 end

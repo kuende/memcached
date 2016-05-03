@@ -104,6 +104,16 @@ module Memcached
       store("prepend", key, value, ttl, flags)
     end
 
+    # Increment key by value
+    def incr(key : String, value : Number = 1)
+      incdec("incr", key, value)
+    end
+
+    # Decrement key by value
+    def decr(key : String, value : Number = 1)
+      incdec("decr", key, value)
+    end
+
     private def write(value : String)
       bytes = value.bytes
       @socket.write(Slice(UInt8).new(bytes.to_unsafe, bytes.size))
@@ -124,6 +134,30 @@ module Memcached
         raise NotStoredError.new("Value not stored, precondition failed")
       elsif line != "STORED\r\n"
         raise WriteError.new("Expected STORED, found: #{line}")
+      end
+    end
+
+    private def incdec(op : String, key : String, value : Number) : Int64
+      write("#{op} #{key} #{value}\r\n")
+
+      line = @socket.gets('\n')
+      if line.nil?
+        raise EOFError.new("EOF reached")
+      end
+
+      if line == "NOT_FOUND\r\n"
+        Memcached.logger.info("#{op} miss: #{key}")
+        begin
+          initial_value = (op == "incr" ? 1 : -1).to_i64 * value
+          add(key, initial_value.to_s)
+          initial_value
+        rescue e : NotStoredError
+          Memcached.logger.info("IncDec: Race condition setting initial value for #{key}")
+          # retry whole operation
+          incdec(op, key, value)
+        end
+      else
+        line.strip.to_i64
       end
     end
 
