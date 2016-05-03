@@ -14,6 +14,7 @@ module Memcached
   class EOFError < UnrecoverableError; end
   class ReadError < UnrecoverableError; end
   class WriteError < UnrecoverableError; end
+  class FlushError < UnrecoverableError; end
 
   #:nodoc:
   def self.logger

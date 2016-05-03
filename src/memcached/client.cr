@@ -57,6 +57,16 @@ module Memcached
 
     # flush deletes all keys from memcached
     def flush
+      write("flush_all\r\n")
+
+      line = @socket.gets('\n')
+      if line.nil?
+        raise EOFError.new("EOF reached")
+      end
+
+      if line != "OK\r\n"
+        raise FlushError.new("Expected OK, got: #{line}")
+      end
     end
 
     private def write(value : String)
