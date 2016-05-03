@@ -24,7 +24,7 @@ Spec2.describe Memcached::Client do
     end
 
     it "sets with expire" do
-      client.set("expires", "soon", 2)
+      client.set("expires", "soon", ttl: 2)
       expect(client.get("expires")).to eq("soon")
       sleep(3)
       expect(client.get("expires")).to eq(nil)
