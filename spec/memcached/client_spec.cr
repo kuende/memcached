@@ -28,4 +28,21 @@ Spec2.describe Memcached::Client do
       expect(client.get("expires")).to eq(nil)
     end
   end
+
+  describe "get_multi" do
+    it "gets multiple keys" do
+      client.flush
+      client.set("key1", "value1")
+      client.set("key3", "value3")
+
+      response = client.get_multi(["key1", "key2", "key3", "key4", "key5"])
+      expect(response).to eq({
+        "key1": "value1",
+        "key2": nil,
+        "key3": "value3",
+        "key4": nil,
+        "key5": nil
+      })
+    end
+  end
 end

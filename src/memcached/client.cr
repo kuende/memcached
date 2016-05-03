@@ -31,6 +31,17 @@ module Memcached
       response
     end
 
+    # Gets multiple key-value pairs
+    def get_multi(keys : Array(String)) : Hash(String, String?)
+      results = {} of String => String?
+
+      keys.each do |key|
+        results[key] = get(key)
+      end
+
+      results
+    end
+
     # Set a key - value pair
     #
     # **Options**
