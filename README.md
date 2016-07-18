@@ -25,7 +25,7 @@ client.set("foo", "bar") # sets key foo=bar
 client.set("foo", "bar", ttl: 3) # set key foo=bar, expire after 3 seconds
 
 client.get("foo") # gets key foo
-client.get_multi(["foo", "other"]) => {"foo": "bar", "other": nil}
+client.get_multi(["foo", "other"]) => {"foo" => "bar", "other" => nil}
 
 client.add("foo", "bar") # set foo=bar only if foo=nil
 client.replace("foo", "bar") # set foo=bar only if foo!=nil
