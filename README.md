@@ -12,6 +12,7 @@ Add this to your application's `shard.yml`:
 dependencies:
   memcached:
     github: kuende/memcached
+    version: ~> 0.2
 ```
 
 
