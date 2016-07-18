@@ -1,5 +1,7 @@
 # Memcached
 
+[![Build Status](https://travis-ci.org/kuende/memcached.svg)](https://travis-ci.org/kuende/memcached)
+
 Crystal client for Memcached using the text procotol.
 
 ## Installation
